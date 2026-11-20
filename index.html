@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Fácil - Nuvem, Catálogo & Entregas</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="tela-auth" class="auth-wrapper">
+        <div class="auth-card">
+            <div class="logo" style="margin-bottom: 16px;">
+                <h2 style="color: #0f172a;">📦 GestãoFácil</h2>
+                <span style="color: #64748b;">Acesso seguro por empresa/usuário</span>
+            </div>
+
+            <form id="form-auth" class="auth-form">
+                <div class="campo">
+                    <label>E-mail</label>
+                    <input type="email" id="auth-email" placeholder="seuemail@empresa.com" required>
+                </div>
+                <div class="campo">
+                    <label>Senha (mín. 6 caracteres)</label>
+                    <input type="password" id="auth-senha" minlength="6" placeholder="••••••••" required>
+                </div>
+
+                <div class="auth-botoes">
+                    <button type="submit" id="btn-entrar" class="btn-primario">Entrar</button>
+                    <button type="button" id="btn-cadastrar" class="btn-secundario">Criar Conta</button>
+                </div>
+                <p id="auth-mensagem" class="auth-mensagem"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-shell" class="app-shell" style="display: none;">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>📦 GestãoFácil</h2>
+                <span id="usuario-logado-email">Conectado na nuvem</span>
+            </div>
+
+            <nav class="menu">
+                <button class="menu-btn active" onclick="mostrarTela('visao-geral', this)">📊 Visão Geral</button>
+                <button class="menu-btn" onclick="mostrarTela('estoque', this)">🍺 Estoque & Catálogo</button>
+                <button class="menu-btn" onclick="mostrarTela('entregas', this)">🚚 Pedidos & Entregas</button>
+                <button class="menu-btn" onclick="mostrarTela('vasilhames', this)">🍾 Vasilhames & Cascos</button>
+                <button class="menu-btn" onclick="mostrarTela('fiado', this)">📒 Fiado & Caderneta</button>
+                <button class="menu-btn" onclick="mostrarTela('fornecedores', this)">🏭 Fornecedores</button>
+                <button class="menu-btn" onclick="mostrarTela('caixa', this)">💵 Fechamento do Dia</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="backup-box">
+                    <button class="btn-backup" onclick="exportarBackup()">💾 Backup JSON</button>
+                    <button class="btn-backup" onclick="sairDaConta()">🚪 Sair</button>
+                </div>
+                <p>Nuvem Supabase + GitHub</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 id="titulo-pagina">Visão Geral do Negócio</h1>
+                <div class="data-hoje" id="data-atual"></div>
+            </header>
+
+            <section id="tela-visao-geral" class="tela ativa">
+                <div class="cards-resumo">
+                    <div class="card">
+                        <span class="card-titulo">Produtos em Estoque</span>
+                        <strong class="card-valor" id="resumo-produtos">0 itens</strong>
+                        <span class="card-detalhe">Total de unidades/caixas</span>
+                    </div>
+                    <div class="card alerta">
+                        <span class="card-titulo">Atenção à Validade</span>
+                        <strong class="card-valor" id="resumo-vencendo">0 lotes</strong>
+                        <span class="card-detalhe">Vencidos ou vencem em 15 dias</span>
+                    </div>
+                    <div class="card">
+                        <span class="card-titulo">Entregas Pendentes</span>
+                        <strong class="card-valor" id="resumo-entregas">0 pedidos</strong>
+                        <span class="card-detalhe">Separando ou na rua</span>
+                    </div>
+                    <div class="card financeiro">
+                        <span class="card-titulo">Pedidos Lançados</span>
+                        <strong class="card-valor" id="resumo-faturamento">R$ 0,00</strong>
+                        <span class="card-detalhe" id="resumo-cobrar">A cobrar em rota: R$ 0,00</span>
+                    </div>
+                    <div class="card cascos">
+                        <span class="card-titulo">Cascos na Rua</span>
+                        <strong class="card-valor" id="resumo-vasilhames">0 cascos</strong>
+                        <span class="card-detalhe">Aguardando devolução</span>
+                    </div>
+                    <div class="card fiado">
+                        <span class="card-titulo">Fiado a Receber</span>
+                        <strong class="card-valor" id="resumo-fiado">R$ 0,00</strong>
+                        <span class="card-detalhe">Notas em aberto na caderneta</span>
+                    </div>
+                </div>
+
+                <div class="painel-box" style="margin-bottom: 24px;">
+                    <h3>🚨 Radar de Prioridades (O que precisa de atenção hoje)</h3>
+                    <ul id="lista-alertas-radar" class="lista-radar"></ul>
+                </div>
+
+                <div class="painel-boas-vindas">
+                    <h3>GestãoFácil na Nuvem — Dados Isolados por Conta</h3>
+                    <p>Cada login tem seus próprios dados salvos com segurança no banco. Cadastre fornecedores, salve produtos no seu catálogo, controle entregas e exporte relatórios em .CSV.</p>
+                    <div class="atalhos">
+                        <button class="btn-primario" onclick="document.querySelectorAll('.menu-btn')[1].click()">+ Cadastrar Produto no Estoque</button>
+                        <button class="btn-secundario" onclick="document.querySelectorAll('.menu-btn')[5].click()">+ Cadastrar Fornecedor</button>
+                        <button class="btn-secundario" onclick="document.querySelectorAll('.menu-btn')[2].click()">+ Lançar Pedido</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-estoque" class="tela">
+                <div class="painel-box">
+                    <h3>⚡ Catálogo Dinâmico (Padrão + Itens Salvos por Você)</h3>
+                    <div class="campo" style="max-width: 560px;">
+                        <label>Selecionar produto do catálogo ou digitar um novo abaixo</label>
+                        <select id="catalogo-rapido" onchange="aplicarProdutoCatalogo()"></select>
+                    </div>
+                </div>
+
+                <div class="painel-box" style="margin-top: 20px;">
+                    <div class="cabecalho-tabela">
+                        <h3>➕ Entrada Rápida de Mercadoria</h3>
+                        <button type="button" class="btn-mini" onclick="salvarNoMeuCatalogo()">⭐ Salvar no Meu Catálogo</button>
+                    </div>
+                    <form id="form-estoque" class="form-grid-estoque-v4">
+                        <div class="campo">
+                            <label>Produto / Marca</label>
+                            <input type="text" id="prod-nome" placeholder="Ex: Cerveja Lata 350ml (Fardo 12)" required>
+                        </div>
+                        <div class="campo">
+                            <label>Categoria</label>
+                            <select id="prod-categoria">
+                                <option value="Cervejas">Cervejas</option>
+                                <option value="Refrigerantes & Sucos">Refrigerantes & Sucos</option>
+                                <option value="Água & Gás">Água & Gás</option>
+                                <option value="Destilados & Vinhos">Destilados & Vinhos</option>
+                                <option value="Alimentos & Mercearia">Alimentos & Mercearia</option>
+                                <option value="Frutas & Hortifruti">Frutas & Hortifruti</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>Fornecedor / Distribuidora</label>
+                            <select id="prod-fornecedor">
+                                <option value="">Fornecedor não informado</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>Local / Setor</label>
+                            <input type="text" id="prod-local" placeholder="Ex: Câmara Fria">
+                        </div>
+                        <div class="campo">
+                            <label>Unidade</label>
+                            <select id="prod-unidade">
+                                <option value="cx">cx (Caixa)</option>
+                                <option value="fd">fd (Fardo)</option>
+                                <option value="un">un (Unidade)</option>
+                                <option value="gl">gl (Galão)</option>
+                                <option value="kg">kg (Quilo)</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>Qtd.</label>
+                            <input type="number" id="prod-qtd" min="1" placeholder="Ex: 50" required>
+                        </div>
+                        <div class="campo">
+                            <label>Custo Un. (R$)</label>
+                            <input type="number" id="prod-custo" step="0.01" min="0" placeholder="Ex: 31.50">
+                        </div>
+                        <div class="campo">
+                            <label>Venda Un. (R$)</label>
+                            <input type="number" id="prod-preco" step="0.01" min="0" placeholder="Ex: 42.90">
+                        </div>
+                        <div class="campo">
+                            <label>Imposto Est. (%)</label>
+                            <input type="number" id="prod-imposto" step="0.1" min="0" max="100" placeholder="Ex: 0">
+                        </div>
+                        <div class="campo">
+                            <label>NCM</label>
+                            <input type="text" id="prod-ncm" placeholder="Ex: 2203.00.00">
+                        </div>
+                        <div class="campo">
+                            <label>CFOP</label>
+                            <input type="text" id="prod-cfop" placeholder="Ex: 5405">
+                        </div>
+                        <div class="campo">
+                            <label>Validade</label>
+                            <input type="date" id="prod-validade" required>
+                        </div>
+                        <div class="campo botao-form">
+                            <button type="submit" class="btn-primario">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 24px;">
+                    <div class="cabecalho-tabela">
+                        <h3>📋 Estoque Atual (Ordenado por Vencimento)</h3>
+                        <div class="acoes-tabela">
+                            <button type="button" class="btn-excel" onclick="exportarEstoqueExcel()">📊 Exportar Estoque (.CSV)</button>
+                            <select id="filtro-estoque" onchange="renderizarEstoque()" class="select-filtro">
+                                <option value="TODOS">Todos os lotes</option>
+                                <option value="vencendo">Vencendo (≤15d) ou Vencidos</option>
+                                <option value="baixo">Estoque Baixo (≤5)</option>
+                            </select>
+                            <input type="text" id="busca-estoque" onkeyup="renderizarEstoque()" placeholder="🔍 Buscar produto, fornecedor, NCM...">
+                        </div>
+                    </div>
+
+                    <div class="tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produto, Fornecedor & Fiscal</th>
+                                    <th>Qtd. Atual</th>
+                                    <th>Valores & Imp.</th>
+                                    <th>Validade</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-estoque-corpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-entregas" class="tela">
+                <div class="painel-box">
+                    <h3>🚚 Novo Pedido / Saída para Entrega</h3>
+                    <form id="form-pedido" class="form-grid-pedidos-v3">
+                        <div class="campo">
+                            <label>Cliente / Bar / Mercado</label>
+                            <input type="text" id="ped-cliente" placeholder="Ex: Bar do Zé" required>
+                        </div>
+                        <div class="campo">
+                            <label>CPF / CNPJ</label>
+                            <input type="text" id="ped-doc" placeholder="Ex: 00.000.000/0001-00">
+                        </div>
+                        <div class="campo">
+                            <label>CEP (Busca automática) <small id="status-cep" style="color:#0284c7;"></small></label>
+                            <input type="text" id="ped-cep" onblur="buscarCepPedido()" placeholder="Ex: 90000-000">
+                        </div>
+                        <div class="campo">
+                            <label>Endereço Completo</label>
+                            <input type="text" id="ped-endereco" placeholder="Ex: Rua das Flores, 120 - Centro" required>
+                        </div>
+                        <div class="campo">
+                            <label>Nº NF-e / Nota (Opcional)</label>
+                            <input type="text" id="ped-nf" placeholder="Ex: NF 00142">
+                        </div>
+                        <div class="campo">
+                            <label>Produto (Lote do Estoque)</label>
+                            <select id="ped-produto" required></select>
+                        </div>
+                        <div class="campo">
+                            <label>Qtd.</label>
+                            <input type="number" id="ped-qtd" min="1" placeholder="Ex: 5" required>
+                        </div>
+                        <div class="campo">
+                            <label>Frota / Entregador</label>
+                            <select id="ped-frota">
+                                <option value="🏍️ Moto 01 (Rápida)">🏍️ Moto 01 (Rápida)</option>
+                                <option value="🚐 Fiorino / Utilitário">🚐 Fiorino / Utilitário</option>
+                                <option value="🚚 Caminhão Baú">🚚 Caminhão Baú</option>
+                                <option value="🏪 Retirada no Balcão">🏪 Retirada no Balcão</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>Pagamento</label>
+                            <select id="ped-pagamento">
+                                <option value="Cobrar Maquininha">Cobrar Maquininha</option>
+                                <option value="Cobrar Dinheiro">Cobrar Dinheiro</option>
+                                <option value="Já Pago (PIX)">Já Pago (PIX)</option>
+                                <option value="Fiado / Nota">Fiado / Nota</option>
+                            </select>
+                        </div>
+                        <div class="campo botao-form">
+                            <button type="submit" class="btn-primario">Lançar Pedido</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 24px;">
+                    <div class="cabecalho-tabela">
+                        <h3>🗺️ Roteiro de Entregas do Dia</h3>
+                        <div class="acoes-tabela">
+                            <button type="button" class="btn-excel" onclick="exportarPedidosExcel()">📊 Exportar Pedidos (.CSV)</button>
+                            <select id="filtro-frota" onchange="renderizarPedidos()" class="select-filtro">
+                                <option value="TODAS">Todas as frotas</option>
+                                <option value="🏍️ Moto 01 (Rápida)">🏍️ Moto 01 (Rápida)</option>
+                                <option value="🚐 Fiorino / Utilitário">🚐 Fiorino / Utilitário</option>
+                                <option value="🚚 Caminhão Baú">🚚 Caminhão Baú</option>
+                                <option value="🏪 Retirada no Balcão">🏪 Retirada no Balcão</option>
+                            </select>
+                            <button type="button" class="btn-mini" onclick="limparEntregues()">🧹 Limpar Entregues</button>
+                            <button type="button" class="btn-whatsapp" onclick="copiarRomaneioWhatsApp()">📲 Copiar Romaneio p/ WhatsApp</button>
+                        </div>
+                    </div>
+
+                    <div class="tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente & Endereço</th>
+                                    <th>Carga & Valor</th>
+                                    <th>Frota</th>
+                                    <th>Financeiro</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-pedidos-corpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-vasilhames" class="tela">
+                <div class="painel-box">
+                    <h3>🍾 Registrar Saída de Vasilhame / Casco</h3>
+                    <form id="form-vasilhame" class="form-grid-vasilhames">
+                        <div class="campo">
+                            <label>Cliente / Estabelecimento</label>
+                            <input type="text" id="vas-cliente" placeholder="Ex: Mercado Perachi" required>
+                        </div>
+                        <div class="campo">
+                            <label>Tipo de Vasilhame</label>
+                            <select id="vas-tipo">
+                                <option value="Engradado Cerveja 600ml (24 un)">Engradado Cerveja 600ml (24 un)</option>
+                                <option value="Litrão Retornável (12 un)">Litrão Retornável (12 un)</option>
+                                <option value="Galão Água 20L">Galão Água 20L</option>
+                                <option value="Botijão Gás P13">Botijão Gás P13</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>Quantidade</label>
+                            <input type="number" id="vas-qtd" min="1" placeholder="Ex: 3" required>
+                        </div>
+                        <div class="campo botao-form">
+                            <button type="submit" class="btn-primario">Registrar Casco</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 24px;">
+                    <div class="cabecalho-tabela">
+                        <h3>🔄 Cascos Pendentes de Devolução</h3>
+                        <input type="text" id="busca-vasilhames" onkeyup="renderizarVasilhames()" placeholder="🔍 Buscar cliente ou casco...">
+                    </div>
+
+                    <div class="tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Tipo</th>
+                                    <th>Pendente</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-vasilhames-corpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-fiado" class="tela">
+                <div class="painel-box">
+                    <h3>📒 Anotar Nota Avulsa na Caderneta</h3>
+                    <form id="form-fiado" class="form-grid-vasilhames">
+                        <div class="campo">
+                            <label>Cliente / Comércio</label>
+                            <input type="text" id="fia-cliente" placeholder="Ex: Lancheria do Trevo" required>
+                        </div>
+                        <div class="campo">
+                            <label>Descrição / Produtos</label>
+                            <input type="text" id="fia-descricao" placeholder="Ex: 5x Fardo Água c/ Gás + 2x Coca 2L" required>
+                        </div>
+                        <div class="campo">
+                            <label>Valor (R$)</label>
+                            <input type="number" id="fia-valor" step="0.01" min="0.01" placeholder="Ex: 145.00" required>
+                        </div>
+                        <div class="campo botao-form">
+                            <button type="submit" class="btn-primario">Salvar na Caderneta</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 24px;">
+                    <div class="cabecalho-tabela">
+                        <h3>💰 Contas a Receber (Fiado / Notas)</h3>
+                        <select id="filtro-fiado" onchange="renderizarFiados()" class="select-filtro">
+                            <option value="ABERTO">Em Aberto</option>
+                            <option value="PAGO">Pagos</option>
+                            <option value="TODOS">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-fiados-corpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-fornecedores" class="tela">
+                <div class="painel-box">
+                    <h3>🏭 Cadastrar Fornecedor / Distribuidora</h3>
+                    <form id="form-fornecedor" class="form-grid-fornecedores">
+                        <div class="campo">
+                            <label>Nome da Distribuidora / Fornecedor</label>
+                            <input type="text" id="forn-nome" placeholder="Ex: Distribuidora Sul Frutas" required>
+                        </div>
+                        <div class="campo">
+                            <label>Ramo / Categoria</label>
+                            <select id="forn-ramo">
+                                <option value="Bebidas & Cervejas">Bebidas & Cervejas</option>
+                                <option value="Frutas & Hortifruti">Frutas & Hortifruti</option>
+                                <option value="Água & Gás">Água & Gás</option>
+                                <option value="Mercearia & Alimentos">Mercearia & Alimentos</option>
+                                <option value="Atacado Geral">Atacado Geral</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label>WhatsApp / Telefone</label>
+                            <input type="text" id="forn-contato" placeholder="Ex: (51) 99999-0000">
+                        </div>
+                        <div class="campo">
+                            <label>Observação de Preço / Prazo</label>
+                            <input type="text" id="forn-obs" placeholder="Ex: Entrega às terças, melhor preço em frutas">
+                        </div>
+                        <div class="campo botao-form">
+                            <button type="submit" class="btn-primario">Salvar Fornecedor</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 24px;">
+                    <div class="cabecalho-tabela">
+                        <h3>📋 Distribuidoras & Fornecedores Cadastrados</h3>
+                    </div>
+
+                    <div class="tabela-responsiva">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fornecedor & Ramo</th>
+                                    <th>Contato</th>
+                                    <th>Observação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-fornecedores-corpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tela-caixa" class="tela">
+                <div class="cards-resumo">
+                    <div class="card financeiro">
+                        <span class="card-titulo">Já Pago (PIX + Quitados)</span>
+                        <strong class="card-valor" id="caixa-pago">R$ 0,00</strong>
+                        <span class="card-detalhe">Valores confirmados</span>
+                    </div>
+                    <div class="card">
+                        <span class="card-titulo">Cobrar na Maquininha</span>
+                        <strong class="card-valor" id="caixa-maquininha">R$ 0,00</strong>
+                        <span class="card-detalhe">Conferir com motoboy/frota</span>
+                    </div>
+                    <div class="card alerta">
+                        <span class="card-titulo">Cobrar em Dinheiro</span>
+                        <strong class="card-valor" id="caixa-dinheiro">R$ 0,00</strong>
+                        <span class="card-detalhe">Conferir notas/moedas no retorno</span>
+                    </div>
+                    <div class="card fiado">
+                        <span class="card-titulo">Fiado em Aberto</span>
+                        <strong class="card-valor" id="caixa-fiado">R$ 0,00</strong>
+                        <span class="card-detalhe">Pendente na caderneta</span>
+                    </div>
+                    <div class="card alerta">
+                        <span class="card-titulo">Impostos Estimados</span>
+                        <strong class="card-valor" id="caixa-imposto">R$ 0,00</strong>
+                        <span class="card-detalhe">Opcional (conforme % informada)</span>
+                    </div>
+                    <div class="card lucro">
+                        <span class="card-titulo">Lucro Líquido Estimado</span>
+                        <strong class="card-valor" id="caixa-lucro">R$ 0,00</strong>
+                        <span class="card-detalhe">Venda − Custo − Imposto est.</span>
+                    </div>
+                </div>
+
+                <div class="painel-box">
+                    <h3>📋 Conferência Prática do Fim do Expediente</h3>
+                    <p style="color:#475569; line-height:1.6;">
+                        Exporte planilhas em <strong>.CSV</strong> para o Excel e baixe seu <strong>Backup JSON</strong> sempre que quiser guardar uma cópia extra.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
