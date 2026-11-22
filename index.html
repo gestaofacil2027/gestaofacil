@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Fácil - Nuvem, Catálogo & Entregas</title>
+    <title>GestãoFácil — Gestão Comercial na Nuvem</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -11,9 +14,10 @@
 
     <div id="tela-auth" class="auth-wrapper">
         <div class="auth-card">
-            <div class="logo" style="margin-bottom: 16px;">
-                <h2 style="color: #0f172a;">📦 GestãoFácil</h2>
-                <span style="color: #64748b;">Acesso seguro por empresa/usuário</span>
+            <div class="auth-brand">
+                <span class="auth-badge">☁️ Supabase Cloud + RLS</span>
+                <h2>📦 GestãoFácil</h2>
+                <p>Acesse o painel da sua empresa com dados isolados e seguros.</p>
             </div>
 
             <form id="form-auth" class="auth-form">
@@ -54,65 +58,110 @@
 
             <div class="sidebar-footer">
                 <div class="backup-box">
-                    <button class="btn-backup" onclick="exportarBackup()">💾 Backup JSON</button>
-                    <button class="btn-backup" onclick="sairDaConta()">🚪 Sair</button>
+                    <button class="btn-backup" onclick="exportarBackup()">💾 Exportar</button>
+                    <label class="btn-backup" style="cursor:pointer;">
+                        📥 Restaurar
+                        <input type="file" id="input-backup-json" accept="application/json" style="display:none;" onchange="restaurarBackupJson(event)">
+                    </label>
                 </div>
-                <p>Nuvem Supabase + GitHub</p>
+                <button class="btn-sair" onclick="sairDaConta()">🚪 Sair da conta</button>
+                <p style="margin-top:8px;">GitHub Pages + Supabase</p>
             </div>
         </aside>
 
         <main class="main-content">
             <header class="topbar">
-                <h1 id="titulo-pagina">Visão Geral do Negócio</h1>
+                <div>
+                    <h1 id="titulo-pagina">Visão Geral do Negócio</h1>
+                </div>
                 <div class="data-hoje" id="data-atual"></div>
             </header>
 
             <section id="tela-visao-geral" class="tela ativa">
                 <div class="cards-resumo">
-                    <div class="card">
+                    <div class="card card-clicavel" onclick="irParaAba(1)">
                         <span class="card-titulo">Produtos em Estoque</span>
                         <strong class="card-valor" id="resumo-produtos">0 itens</strong>
-                        <span class="card-detalhe">Total de unidades/caixas</span>
+                        <span class="card-detalhe">Total de unidades/caixas • Ver estoque</span>
                     </div>
-                    <div class="card alerta">
+                    <div class="card alerta card-clicavel" onclick="irParaAba(1)">
                         <span class="card-titulo">Atenção à Validade</span>
                         <strong class="card-valor" id="resumo-vencendo">0 lotes</strong>
                         <span class="card-detalhe">Vencidos ou vencem em 15 dias</span>
                     </div>
-                    <div class="card">
+                    <div class="card card-clicavel" onclick="irParaAba(2)">
                         <span class="card-titulo">Entregas Pendentes</span>
                         <strong class="card-valor" id="resumo-entregas">0 pedidos</strong>
-                        <span class="card-detalhe">Separando ou na rua</span>
+                        <span class="card-detalhe">Separando ou na rua • Ver rota</span>
                     </div>
-                    <div class="card financeiro">
+                    <div class="card financeiro card-clicavel" onclick="irParaAba(6)">
                         <span class="card-titulo">Pedidos Lançados</span>
                         <strong class="card-valor" id="resumo-faturamento">R$ 0,00</strong>
                         <span class="card-detalhe" id="resumo-cobrar">A cobrar em rota: R$ 0,00</span>
                     </div>
-                    <div class="card cascos">
+                    <div class="card cascos card-clicavel" onclick="irParaAba(3)">
                         <span class="card-titulo">Cascos na Rua</span>
                         <strong class="card-valor" id="resumo-vasilhames">0 cascos</strong>
-                        <span class="card-detalhe">Aguardando devolução</span>
+                        <span class="card-detalhe">Aguardando devolução • Ver cascos</span>
                     </div>
-                    <div class="card fiado">
+                    <div class="card fiado card-clicavel" onclick="irParaAba(4)">
                         <span class="card-titulo">Fiado a Receber</span>
                         <strong class="card-valor" id="resumo-fiado">R$ 0,00</strong>
                         <span class="card-detalhe">Notas em aberto na caderneta</span>
                     </div>
                 </div>
 
-                <div class="painel-box" style="margin-bottom: 24px;">
+                <div class="grid-dashboard-insights">
+                    <div class="painel-box">
+                        <h3>📊 Saúde Financeira & Ritmo de Entregas</h3>
+
+                        <div class="bloco-progresso">
+                            <div class="progresso-topo">
+                                <span>Distribuição Financeira</span>
+                                <span>Lucro est.: <strong id="dash-lucro-estimado">R$ 0,00</strong></span>
+                            </div>
+                            <div class="barra-segmentada">
+                                <div id="barra-fin-pago" class="seg-pago" style="width: 0%;"></div>
+                                <div id="barra-fin-rota" class="seg-rota" style="width: 0%;"></div>
+                                <div id="barra-fin-fiado" class="seg-fiado" style="width: 0%;"></div>
+                            </div>
+                            <div class="legendas-fin">
+                                <span id="legenda-fin-pago">Pago: R$ 0,00 (0%)</span>
+                                <span id="legenda-fin-rota">Em rota: R$ 0,00 (0%)</span>
+                                <span id="legenda-fin-fiado">Fiado: R$ 0,00 (0%)</span>
+                            </div>
+                        </div>
+
+                        <div class="bloco-progresso" style="margin-top: 18px;">
+                            <div class="progresso-topo">
+                                <span>Progresso de Entregas</span>
+                                <span id="texto-entregas-progresso">0 de 0 pedidos entregues (0%)</span>
+                            </div>
+                            <div class="barra-simples">
+                                <div id="barra-entregas-progresso" class="barra-simples-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="painel-box">
+                        <h3>🕒 Movimentações Recentes (Sessão)</h3>
+                        <ul id="lista-movimentacoes" class="lista-movimentacoes"></ul>
+                    </div>
+                </div>
+
+                <div class="painel-box" style="margin-top: 20px; margin-bottom: 20px;">
                     <h3>🚨 Radar de Prioridades (O que precisa de atenção hoje)</h3>
                     <ul id="lista-alertas-radar" class="lista-radar"></ul>
                 </div>
 
                 <div class="painel-boas-vindas">
-                    <h3>GestãoFácil na Nuvem — Dados Isolados por Conta</h3>
-                    <p>Cada login tem seus próprios dados salvos com segurança no banco. Cadastre fornecedores, salve produtos no seu catálogo, controle entregas e exporte relatórios em .CSV.</p>
+                    <h3>Ações Rápidas do Dia</h3>
+                    <p>Acesse direto os fluxos mais usados no balcão, na expedição ou na conferência de caixa.</p>
                     <div class="atalhos">
-                        <button class="btn-primario" onclick="document.querySelectorAll('.menu-btn')[1].click()">+ Cadastrar Produto no Estoque</button>
-                        <button class="btn-secundario" onclick="document.querySelectorAll('.menu-btn')[5].click()">+ Cadastrar Fornecedor</button>
-                        <button class="btn-secundario" onclick="document.querySelectorAll('.menu-btn')[2].click()">+ Lançar Pedido</button>
+                        <button class="btn-primario" onclick="irParaAba(1)">+ Entrada de Mercadoria</button>
+                        <button class="btn-secundario" onclick="irParaAba(2)">+ Novo Pedido / Entrega</button>
+                        <button class="btn-secundario" onclick="irParaAba(5)">+ Cadastrar Fornecedor</button>
+                        <button class="btn-secundario" onclick="irParaAba(6)">💵 Conferir Caixa</button>
                     </div>
                 </div>
             </section>
@@ -207,13 +256,17 @@
                         <div class="acoes-tabela">
                             <button type="button" class="btn-excel" onclick="exportarEstoqueExcel()">📊 Exportar Estoque (.CSV)</button>
                             <select id="filtro-estoque" onchange="renderizarEstoque()" class="select-filtro">
-                                <option value="TODOS">Todos os lotes</option>
+                                <option value="TODOS">Disponíveis (ocultar zerados)</option>
                                 <option value="vencendo">Vencendo (≤15d) ou Vencidos</option>
                                 <option value="baixo">Estoque Baixo (≤5)</option>
+                                <option value="zerados">Zerados / Encerrados</option>
                             </select>
+                            <button type="button" class="btn-mini" onclick="limparFiltrosEstoque()">Limpar filtro</button>
                             <input type="text" id="busca-estoque" onkeyup="renderizarEstoque()" placeholder="🔍 Buscar produto, fornecedor, NCM...">
                         </div>
                     </div>
+
+                    <div id="resumo-rapido-estoque" class="chips-resumo" style="margin-bottom: 14px;"></div>
 
                     <div class="tabela-responsiva">
                         <table>
@@ -246,7 +299,7 @@
                             <input type="text" id="ped-doc" placeholder="Ex: 00.000.000/0001-00">
                         </div>
                         <div class="campo">
-                            <label>CEP (Busca automática) <small id="status-cep" style="color:#0284c7;"></small></label>
+                            <label>CEP (Busca automática) <small id="status-cep" class="status-cep"></small></label>
                             <input type="text" id="ped-cep" onblur="buscarCepPedido()" placeholder="Ex: 90000-000">
                         </div>
                         <div class="campo">
@@ -294,6 +347,12 @@
                         <h3>🗺️ Roteiro de Entregas do Dia</h3>
                         <div class="acoes-tabela">
                             <button type="button" class="btn-excel" onclick="exportarPedidosExcel()">📊 Exportar Pedidos (.CSV)</button>
+                            <select id="filtro-status-pedido" onchange="renderizarPedidos()" class="select-filtro">
+                                <option value="TODOS">Todos os status</option>
+                                <option value="Separando">📦 Separando</option>
+                                <option value="Em Rota">🛵 Em Rota</option>
+                                <option value="Entregue">✔️ Entregue</option>
+                            </select>
                             <select id="filtro-frota" onchange="renderizarPedidos()" class="select-filtro">
                                 <option value="TODAS">Todas as frotas</option>
                                 <option value="🏍️ Moto 01 (Rápida)">🏍️ Moto 01 (Rápida)</option>
@@ -313,7 +372,7 @@
                                     <th>Cliente & Endereço</th>
                                     <th>Carga & Valor</th>
                                     <th>Frota</th>
-                                    <th>Financeiro</th>
+                                    <th>Pagamento</th>
                                     <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
@@ -349,6 +408,11 @@
                             <button type="submit" class="btn-primario">Registrar Casco</button>
                         </div>
                     </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 20px;">
+                    <h3>👥 Acumulado de Cascos por Cliente</h3>
+                    <div id="resumo-clientes-vasilhames" class="chips-resumo"></div>
                 </div>
 
                 <div class="painel-box" style="margin-top: 24px;">
@@ -394,6 +458,11 @@
                             <button type="submit" class="btn-primario">Salvar na Caderneta</button>
                         </div>
                     </form>
+                </div>
+
+                <div class="painel-box" style="margin-top: 20px;">
+                    <h3>👥 Saldo em Aberto por Cliente</h3>
+                    <div id="resumo-clientes-fiado" class="chips-resumo"></div>
                 </div>
 
                 <div class="painel-box" style="margin-top: 24px;">
@@ -510,11 +579,22 @@
                     </div>
                 </div>
 
-                <div class="painel-box">
-                    <h3>📋 Conferência Prática do Fim do Expediente</h3>
-                    <p style="color:#475569; line-height:1.6;">
-                        Exporte planilhas em <strong>.CSV</strong> para o Excel e baixe seu <strong>Backup JSON</strong> sempre que quiser guardar uma cópia extra.
+                <div class="painel-box" style="margin-bottom: 20px;">
+                    <div class="cabecalho-tabela">
+                        <h3>📋 Fechamento & Planilha do Caixa</h3>
+                        <div class="acoes-tabela">
+                            <button type="button" class="btn-excel" onclick="exportarFechamentoExcel()">📊 Exportar Fechamento (.CSV)</button>
+                            <button type="button" class="btn-primario" onclick="realizarFechamentoCaixa()">🔒 Fechar Caixa do Dia</button>
+                        </div>
+                    </div>
+                    <p style="color:#475569; line-height:1.55; font-size:0.9rem;">
+                        Fechamentos salvos ficam gravados na nuvem (sobrevivem ao F5). Limpar pedidos entregues oculta apenas a fila da rota sem apagar valores do caixa.
                     </p>
+                </div>
+
+                <div class="painel-box">
+                    <h3>🕒 Fechamentos Salvos na Nuvem</h3>
+                    <div id="historico-fechamentos" class="lista-fechamentos"></div>
                 </div>
             </section>
         </main>
