@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 :root {
     --bg-app: #eef2f6;
     --bg-surface: #ffffff;
@@ -839,4 +840,521 @@ tbody tr:hover {
     .auth-botoes {
         grid-template-columns: 1fr;
     }
+=======
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #f4f6f9;
+    color: #1e293b;
+}
+
+/* Tela de Login / Cadastro */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #0f172a;
+}
+
+.auth-card {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.auth-botoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.auth-mensagem {
+    font-size: 0.85rem;
+    color: #0369a1;
+    min-height: 18px;
+}
+
+/* Estrutura Principal */
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Menu Lateral */
+.sidebar {
+    width: 250px;
+    background-color: #0f172a;
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    flex-shrink: 0;
+}
+
+.logo h2 {
+    font-size: 1.4rem;
+    color: #38bdf8;
+}
+
+.logo span {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    word-break: break-all;
+}
+
+.menu {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.menu-btn {
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.menu-btn:hover {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.menu-btn.active {
+    background-color: #0284c7;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: center;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    flex: 1;
+    padding: 28px 36px;
+    overflow-x: auto;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar h1 {
+    font-size: 1.6rem;
+    color: #0f172a;
+}
+
+.data-hoje {
+    font-size: 0.9rem;
+    color: #64748b;
+    text-transform: capitalize;
+}
+
+/* Controle de Telas */
+.tela {
+    display: none;
+}
+
+.tela.ativa {
+    display: block;
+}
+
+/* Cards de Resumo */
+.cards-resumo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border-left: 4px solid #0284c7;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card.alerta { border-left-color: #f59e0b; }
+.card.financeiro { border-left-color: #16a34a; }
+.card.cascos { border-left-color: #8b5cf6; }
+.card.fiado { border-left-color: #e11d48; }
+.card.lucro { border-left-color: #0ea5e9; }
+
+.card-titulo {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.card-valor {
+    font-size: 1.8rem;
+    color: #0f172a;
+}
+
+.card-detalhe {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* Painéis e Botões */
+.painel-boas-vindas, .painel-vazio, .painel-box {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.painel-boas-vindas h3, .painel-vazio h3, .painel-box h3 {
+    margin-bottom: 12px;
+    color: #0f172a;
+    font-size: 1.1rem;
+}
+
+.painel-boas-vindas p, .painel-vazio p {
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.atalhos {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-primario, .btn-secundario {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primario {
+    background-color: #0284c7;
+    color: #ffffff;
+}
+
+.btn-primario:hover { background-color: #0369a1; }
+
+.btn-secundario {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-secundario:hover { background-color: #cbd5e1; }
+
+.btn-whatsapp {
+    background-color: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-whatsapp:hover { background-color: #15803d; }
+
+.btn-excel {
+    background-color: #15803d;
+    color: #ffffff;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-excel:hover { background-color: #166534; }
+
+/* Formulários e Tabelas */
+.form-grid,
+.form-grid-estoque,
+.form-grid-estoque-v2,
+.form-grid-estoque-v3,
+.form-grid-estoque-v4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    align-items: end;
+}
+
+.form-grid-pedidos,
+.form-grid-pedidos-v3 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    align-items: end;
+}
+
+.form-grid-vasilhames,
+.form-grid-fornecedores {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.campo input, .campo select, #busca-estoque, .select-filtro {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    background-color: #ffffff;
+    color: #1e293b;
+}
+
+.campo input:focus, .campo select:focus, #busca-estoque:focus {
+    border-color: #0284c7;
+}
+
+.cabecalho-tabela {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cabecalho-tabela h3 { margin-bottom: 0; }
+#busca-estoque { min-width: 250px; }
+.tabela-responsiva { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    padding: 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.92rem;
+}
+
+.linha-alerta { background-color: #fffbeb; }
+.linha-vencida { background-color: #fef2f2; }
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.badge.ok { background-color: #dcfce7; color: #166534; }
+.badge.alerta { background-color: #fef3c7; color: #b45309; }
+.badge.vencido { background-color: #fee2e2; color: #b91c1c; }
+.badge.rota { background-color: #e0f2fe; color: #0369a1; }
+
+.tag-pag {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.tag-pag.cobrar {
+    background-color: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.tag-pag.pago {
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+
+.tag-pag.fiado {
+    background-color: #ffe4e6;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+}
+
+.acoes-tabela {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-mini {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.btn-mini:hover { background: #f1f5f9; }
+.btn-mini.perigo:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+.btn-mini.acao-rota { background-color: #0284c7; color: #ffffff; border-color: #0284c7; }
+.btn-mini.acao-rota:hover { background-color: #0369a1; }
+.btn-mini.acao-ok { background-color: #16a34a; color: #ffffff; border-color: #16a34a; }
+.btn-mini.acao-ok:hover { background-color: #15803d; }
+.btn-mini.recibo { background-color: #f8fafc; }
+
+/* Radar, Estoque Baixo e Backup */
+.lista-radar {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lista-radar li {
+    padding: 12px 14px;
+    background-color: #f8fafc;
+    border-left: 4px solid #f59e0b;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    color: #1e293b;
+}
+
+.lista-radar li.alerta-ok {
+    border-left-color: #16a34a;
+    background-color: #f0fdf4;
+    color: #166534;
+}
+
+.tag-baixo {
+    background-color: #ffedd5;
+    color: #c2410c;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+.backup-box {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.btn-backup {
+    flex: 1;
+    background-color: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    padding: 7px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.btn-backup:hover {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+/* Responsividade */
+@media (max-width: 1100px) {
+    .form-grid,
+    .form-grid-estoque,
+    .form-grid-estoque-v2,
+    .form-grid-estoque-v3,
+    .form-grid-estoque-v4,
+    .form-grid-pedidos,
+    .form-grid-pedidos-v3,
+    .form-grid-vasilhames,
+    .form-grid-fornecedores {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { width: 100%; padding: 16px; }
+    .menu { flex-direction: row; margin-top: 16px; overflow-x: auto; }
+    .main-content { padding: 20px; }
+}
+
+@media (max-width: 600px) {
+    .form-grid,
+    .form-grid-estoque,
+    .form-grid-estoque-v2,
+    .form-grid-estoque-v3,
+    .form-grid-estoque-v4,
+    .form-grid-pedidos,
+    .form-grid-pedidos-v3,
+    .form-grid-vasilhames,
+    .form-grid-fornecedores {
+        grid-template-columns: 1fr;
+    }
+
 }
